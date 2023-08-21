@@ -70,7 +70,7 @@ export const createUserDocumentFromAuth = async(userAuth,additionalInfo)=>{
     }
   }
   //if exits
-  return userDocRef;
+  return userSnapshot;
 }
 
 // signUPWithEmailAndPassword
@@ -100,6 +100,19 @@ export const SignOutUser = async()=>{
 export const onAuthStateChangedListener = (callback)=>{
   onAuthStateChanged(auth,callback);
 }
+// use Promise
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject)=>{
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (userAuth)=>{
+        unsubscribe();
+        resolve(userAuth);
+      },
+      reject
+    )
+  })
+}
 
 
 //Adding shop data to firebase
@@ -116,15 +129,17 @@ export const addCollectionAndDocument = async(collectionKey,objectsToAdd)=>{
   console.log('done');
 }
 
-export const getCategoriesAndDocument = async()=>{
-  const collectionRef = collection(db,'categories');
+export const getCategoriesAndDocument = async(data='categories')=>{
+  const collectionRef = collection(db,data);
   const q = query(collectionRef);
 
   const querySnapShot = await getDocs(q);
-  const categoryMap = querySnapShot.docs.reduce((acc,docSnapShot)=>{
-    const {title, items} = docSnapShot.data();
-    acc[title.toLowerCase()] = items;
-    return acc;
-  },{});
-  return categoryMap;
+  return querySnapShot.docs.map(docSnapShot=> docSnapShot.data());
+  // .reduce((acc,docSnapShot)=>{
+  //   const {title, items} = docSnapShot.data();
+  //   acc[title.toLowerCase()] = items;
+  //   return acc;
+  // },{});
+
+  // return categoryMap;  
 }
