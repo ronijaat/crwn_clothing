@@ -5,9 +5,9 @@ import { UseSelector, useSelector } from "react-redux";
 import {selectCartTotal} from '../../store/cart/cart.selector';
 import {selectCurrentUser} from '../../store/user/user.selector'
 
-import Button,{BUTTON_TYPE_CLASSES} from "../button/button.component";
+import {BUTTON_TYPE_CLASSES} from "../button/button.component";
 
-import { PaymentFormContainer, FormContainer } from "./payment-form.styles";
+import { PaymentFormContainer, FormContainer,PaymentButton } from "./payment-form.styles";
 
 const PaymentForm = ()=>{
     const stripe = useStripe();
@@ -18,7 +18,7 @@ const PaymentForm = ()=>{
 
     const paymentHandler = async (e)=>{
         e.preventDefault();
-        setisProcessingPayment('true');
+        setisProcessingPayment(true);
         if(!stripe || !elements){
             return;
         }
@@ -39,7 +39,7 @@ const PaymentForm = ()=>{
                 }
             }
         })
-        setisProcessingPayment('false');
+        setisProcessingPayment(false);
 
         if(paymentResult.error){
             alert(paymentResult.error);
@@ -48,6 +48,7 @@ const PaymentForm = ()=>{
                 alert('Payment Successful');
             }
         }
+        
     }
 
     return (
@@ -55,7 +56,7 @@ const PaymentForm = ()=>{
             <FormContainer onClick={paymentHandler}>
                 <h2>Credit Card Payment:</h2>
                 <CardElement/>
-                <Button disabled={isProcessingPayment} type='button' buttonType={BUTTON_TYPE_CLASSES.inverted}>Pay now</Button>
+                <PaymentButton isLoading={isProcessingPayment} buttonType={BUTTON_TYPE_CLASSES.inverted}>Pay now</PaymentButton>
             </FormContainer>
         </PaymentFormContainer>
     )
